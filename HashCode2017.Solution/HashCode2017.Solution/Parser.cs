@@ -23,6 +23,56 @@ namespace HashCode2017.Solution
                 CacheServerCapacity = Convert.ToInt32(metaData[4])
             };
 
+            problem.VideoSizes = lines[1].Split(' ').Select(x => Convert.ToInt32(x)).ToList();
+
+            var nextEndpoint = 2;
+            Endpoint latestEndpoint = null;
+            var lastIndex = 2;
+
+            for (int i = 2; i < lines.Length; i++)
+            {
+                lastIndex = i;
+                var unparsed = lines[i].Split(' ');
+                if (unparsed.Length == 3)
+                {
+                    break;
+                }
+
+                if (nextEndpoint == i)
+                {
+                    latestEndpoint = new Endpoint
+                    {
+                        Latency = Convert.ToInt32(unparsed[0]),
+                        ConnectedCacheServers = Convert.ToInt32(unparsed[1])
+                    };
+
+                    problem.Endpoints.Add(latestEndpoint);
+                    nextEndpoint = i + latestEndpoint.ConnectedCacheServers;
+                }
+                else
+                {
+                    var cache = new Cache
+                    {
+                        Id = Convert.ToInt32(unparsed[0]),
+                        Latency = Convert.ToInt32(unparsed[1])
+                    };
+
+                    latestEndpoint.ConnectedCaches.Add(cache);
+                }
+            }
+
+            for (int i = lastIndex; i < lines.Length; i++)
+            {
+                var unparsed = lines[i].Split(' ');
+
+                problem.RequestDescriptions.Add(new RequestDescription
+                {
+                    VideoId = Convert.ToInt32(unparsed[0]),
+                    EndpointId = Convert.ToInt32(unparsed[1]),
+                    NumberOfRequests = Convert.ToInt32(unparsed[2])
+                });
+            }
+
             return problem;
         }
     }
