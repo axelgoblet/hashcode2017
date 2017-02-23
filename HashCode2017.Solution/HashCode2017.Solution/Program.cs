@@ -22,7 +22,7 @@ namespace HashCode2017.Solution
                             new
                             {
                                 VideoId = grouping.Key,
-                                EndpointIds = grouping.Select(x => x.EndpointId).ToList(),
+                                EndpointIds = grouping.Select(x => x.EndpointId).Distinct().ToList(),
                                 RequestCount = grouping.Sum(y => y.NumberOfRequests)
                             })
                     .OrderByDescending(x => x.RequestCount)
