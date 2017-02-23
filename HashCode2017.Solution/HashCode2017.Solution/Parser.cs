@@ -92,6 +92,11 @@ namespace HashCode2017.Solution
 
         public static void Publish(Solution solution, string path)
         {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+
             using (var stream = File.OpenWrite(path))
             using (var writeStream = new StreamWriter(stream))
             {

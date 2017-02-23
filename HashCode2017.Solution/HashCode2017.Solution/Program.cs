@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
+using System.Threading.Tasks;
 
 namespace HashCode2017.Solution
 {
@@ -46,10 +48,12 @@ namespace HashCode2017.Solution
         static void Main(string[] args)
         {
             // var problem = Parser.Load("../../../Input/me_at_the_zoo.in");
-            var problem = Parser.Load("../../../Input/videos_worth_spreading.in");
+            // var problem = Parser.Load("../../../Input/videos_worth_spreading.in");
             // var problem = Parser.Load("../../../Input/trending_today.in");
+            var problem = Parser.Load("../../../Input/kittens.in");
 
-            problem.Endpoints = problem.Endpoints.Where(e => e.ConnectedCacheServers > 0).ToList();
+            Console.WriteLine("Hello!");
+
             foreach (var endpoint in problem.Endpoints)
             {
                 endpoint.ConnectedCaches = endpoint.ConnectedCaches.Where(c => c.Latency < endpoint.Latency).ToList();
@@ -66,7 +70,7 @@ namespace HashCode2017.Solution
                 problem.RequestDescriptions.GroupBy(x => x.VideoId)
                     .Select(
                         grouping =>
-                            new VideoStatistics(problem.Videos.Single(y => y.Id == grouping.Key),
+                            new VideoStatistics(problem.Videos.SingleOrDefault(y => y.Id == grouping.Key),
                                 grouping.Select(x => problem.Endpoints.Single(y => x.EndpointId == y.Id))
                                     .Distinct()
                                     .ToList(), grouping.Sum(y => y.NumberOfRequests), 0))
@@ -85,6 +89,7 @@ namespace HashCode2017.Solution
                 solution.CacheServers.Add(new CacheServer {Id = cacheServer.Id});
             }
 
+            var count = 0;
             foreach (var videoStatistic in videoRequests)
             {
                 CacheServer bestCache = null;
@@ -111,11 +116,15 @@ namespace HashCode2017.Solution
                     cache.VideoIds.Add(videoStatistic.Video.Id);
                     cache.CurrentSize += videoStatistic.Video.Size;
                 }
+
+                count++;
+                Console.WriteLine("Processed video {0} / {1}", count, problem.NumberOfVideos);
             }
 
             // Parser.Publish(solution, "../../../Output/me_at_the_zoo.out");
-            Parser.Publish(solution, "../../../Output/videos_worth_spreading.out");
+            // Parser.Publish(solution, "../../../Output/videos_worth_spreading.out");
             // Parser.Publish(solution, "../../../Output/trending_today.out");
+            Parser.Publish(solution, "../../../Output/kittens.out");
         }
 
         private static Solution Solve()
