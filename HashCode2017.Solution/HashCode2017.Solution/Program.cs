@@ -15,6 +15,12 @@ namespace HashCode2017.Solution
                 endpoint.ConnectedCaches = endpoint.ConnectedCaches.Where(c => c.Latency < endpoint.Latency).ToList();
             }
 
+
+            foreach (var cacheServer in problem.CacheServers)
+            {
+                cacheServer.Endpoints = problem.Endpoints.Where(x => x.ConnectedCaches.Any(y => y.Id == cacheServer.Id)).ToList();
+            }
+
             var videoRequests =
                 problem.RequestDescriptions.GroupBy(x => x.VideoId)
                     .Select(

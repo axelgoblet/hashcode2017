@@ -12,10 +12,13 @@ namespace HashCode2017.Solution
         public CacheServer()
         {
             VideoIds = new List<int>();
+            Endpoints = new List<Endpoint>();
         }
 
         public int Id { get; set; }
 
         public List<int> VideoIds { get; set; }
+
+        public List<Endpoint> Endpoints { get; set; }
     }
 }
