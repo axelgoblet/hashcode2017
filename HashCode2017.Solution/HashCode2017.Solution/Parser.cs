@@ -75,5 +75,19 @@ namespace HashCode2017.Solution
 
             return problem;
         }
+
+        public static void Publish(Solution solution, string path)
+        {
+            using (var stream = File.OpenWrite(path))
+            using (var writeStream = new StreamWriter(stream))
+            {
+                writeStream.WriteLine(solution.CacheServers.Count);
+
+                foreach (var cacheServer in solution.CacheServers)
+                {
+                    writeStream.WriteLine("{0} {1}", cacheServer.Id, string.Join(" ", cacheServer.VideoIds.Select(x => x.ToString())));
+                }
+            }
+        }
     }
 }
