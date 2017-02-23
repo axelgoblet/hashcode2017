@@ -6,6 +6,7 @@ namespace HashCode2017.Solution
     {
         public Problem()
         {
+            Videos = new List<Video>();
             Endpoints = new List<Endpoint>();
             RequestDescriptions = new List<RequestDescription>();
         }
@@ -20,11 +21,18 @@ namespace HashCode2017.Solution
 
         public int CacheServerCapacity { get; set; }
 
-        public List<int> VideoSizes { get; set; }
+        public List<Video> Videos { get; set; }
 
         public List<Endpoint> Endpoints { get; set; }
 
         public List<RequestDescription> RequestDescriptions { get; set; }
+    }
+
+    public class Video
+    {
+        public int Id { get; set; }
+
+        public int Size { get; set; }
     }
 
     public class Endpoint
