@@ -49,8 +49,8 @@ namespace HashCode2017.Solution
         {
             // var problem = Parser.Load("../../../Input/me_at_the_zoo.in");
             // var problem = Parser.Load("../../../Input/videos_worth_spreading.in");
-            // var problem = Parser.Load("../../../Input/trending_today.in");
-            var problem = Parser.Load("../../../Input/kittens.in");
+            var problem = Parser.Load("../../../Input/trending_today.in");
+            // var problem = Parser.Load("../../../Input/kittens.in");
 
             Console.WriteLine("Hello!");
 
@@ -66,47 +66,64 @@ namespace HashCode2017.Solution
                     problem.Endpoints.Where(x => x.ConnectedCaches.Any(y => y.Id == cacheServer.Id)).ToList();
             }
 
+            var solution = new Solution();
+
+            foreach (var cacheServer in problem.CacheServers)
+            {
+                solution.CacheServers.Add(new CacheServer { Id = cacheServer.Id });
+            }
+
             var videoRequests =
                 problem.RequestDescriptions.GroupBy(x => x.VideoId)
                     .Select(
                         grouping =>
-                            new VideoStatistics(problem.Videos.SingleOrDefault(y => y.Id == grouping.Key),
+                            new VideoStatistics(problem.Videos.Single(y => y.Id == grouping.Key),
                                 grouping.Select(x => problem.Endpoints.Single(y => x.EndpointId == y.Id))
                                     .Distinct()
                                     .ToList(), grouping.Sum(y => y.NumberOfRequests), 0))
                     .Select(y =>
                     {
-                        y.Value = y.RequestCount/y.Video.Size;
+                        y.Value = y.RequestCount / y.Video.Size;
                         return y;
                     })
                     .OrderByDescending(x => x.Value)
                     .ToList();
 
-            var solution = new Solution();
-
-            foreach (var cacheServer in problem.CacheServers)
-            {
-                solution.CacheServers.Add(new CacheServer {Id = cacheServer.Id});
-            }
-
             var count = 0;
-            foreach (var videoStatistic in videoRequests)
+
+            while (videoRequests.Count > 0)
             {
+                var videoStatistic = videoRequests.First();
+
                 CacheServer bestCache = null;
                 var bestScore = 0;
+                List<RequestDescription> bestUsedRequestDescriptions = null;
                 foreach (var cacheServer in problem.CacheServers)
                 {
-                    var intersect = videoStatistic.Endpoints.Intersect(cacheServer.Endpoints).ToList();
-                    if (bestCache == null || intersect.Count > bestScore)
+                    var intersect = videoStatistic.Endpoints.Intersect(cacheServer.Endpoints).Select(e => e.Id).ToList();
+                    var usedRequestDescriptions =
+                        problem.RequestDescriptions.Where(
+                            r => intersect.Contains(r.EndpointId) && r.VideoId == videoStatistic.Video.Id).ToList();
+                    var score = usedRequestDescriptions.Select(r => r.NumberOfRequests).Sum();
+                    if (bestCache == null || score > bestScore)
                     {
                         var solutionCache = solution.CacheServers.Single(y => y.Id == cacheServer.Id);
+
+                        // cache full
                         if (solutionCache.CurrentSize + videoStatistic.Video.Size > problem.CacheServerCapacity)
                         {
                             continue;
                         }
 
+                        // video already in cache
+                        if (solutionCache.VideoIds.Contains(videoStatistic.Video.Id))
+                        {
+                            continue;
+                        }
+
                         bestCache = cacheServer;
-                        bestScore = intersect.Count;
+                        bestScore = score;
+                        bestUsedRequestDescriptions = usedRequestDescriptions;
                     }
                 }
 
@@ -115,36 +132,32 @@ namespace HashCode2017.Solution
                     var cache = solution.CacheServers.Single(y => y.Id == bestCache.Id);
                     cache.VideoIds.Add(videoStatistic.Video.Id);
                     cache.CurrentSize += videoStatistic.Video.Size;
-                }
 
-                count++;
-                Console.WriteLine("Processed video {0} / {1}", count, problem.NumberOfVideos);
+                    // remove requests from ranking and reorder
+                    videoStatistic.Value -= bestScore / videoStatistic.Video.Size;
+                    videoRequests = videoRequests.OrderByDescending(v => v.Value).ToList();
+
+                    count += bestUsedRequestDescriptions.Count;
+
+                    // remove request descriptions used
+                    foreach (var d in bestUsedRequestDescriptions)
+                    {
+                        problem.RequestDescriptions.Remove(d);
+                    }
+
+                    Console.WriteLine("Processed requests {0} / {1}", count, problem.NumberOfRequestDescriptions);
+                }
+                else
+                {
+                    // remove video from list (no more caches to fit it in)
+                    videoRequests.RemoveAt(0);
+                }
             }
 
             // Parser.Publish(solution, "../../../Output/me_at_the_zoo.out");
             // Parser.Publish(solution, "../../../Output/videos_worth_spreading.out");
-            // Parser.Publish(solution, "../../../Output/trending_today.out");
-            Parser.Publish(solution, "../../../Output/kittens.out");
-        }
-
-        private static Solution Solve()
-        {
-            return new Solution
-            {
-                CacheServers = new List<CacheServer>
-                {
-                    new CacheServer
-                    {
-                        Id = 0,
-                        VideoIds = new List<int> {1, 2}
-                    },
-                    new CacheServer
-                    {
-                        Id = 1,
-                        VideoIds = new List<int> {3, 4, 5}
-                    },
-                }
-            };
+            Parser.Publish(solution, "../../../Output/trending_today.out");
+            // Parser.Publish(solution, "../../../Output/kittens.out");
         }
     }
 }
