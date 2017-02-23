@@ -23,7 +23,10 @@ namespace HashCode2017.Solution
                 CacheServerCapacity = Convert.ToInt32(metaData[4])
             };
 
-            problem.VideoSizes = lines[1].Split(' ').Select(x => Convert.ToInt32(x)).ToList();
+            problem.Videos =
+                lines[1].Split(' ')
+                    .Select((value, index) => new Video {Id = index, Size = Convert.ToInt32(value)})
+                    .ToList();
 
             var nextEndpoint = 2;
             Endpoint latestEndpoint = null;
