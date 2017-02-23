@@ -44,6 +44,8 @@ namespace HashCode2017.Solution
             ConnectedCaches = new List<Cache>();
         }
 
+        public int Id { get; set; }
+
         public int Latency { get; set; }
 
         public int ConnectedCacheServers { get; set; }

@@ -32,6 +32,7 @@ namespace HashCode2017.Solution
             Endpoint latestEndpoint = null;
             var lastIndex = 2;
             var cacheServers = new List<CacheServer>();
+            var endpointId = 0;
 
             for (int i = 2; i < lines.Length; i++)
             {
@@ -46,12 +47,14 @@ namespace HashCode2017.Solution
                 {
                     latestEndpoint = new Endpoint
                     {
+                        Id = endpointId,
                         Latency = Convert.ToInt32(unparsed[0]),
                         ConnectedCacheServers = Convert.ToInt32(unparsed[1])
                     };
 
                     problem.Endpoints.Add(latestEndpoint);
                     nextEndpoint = i + latestEndpoint.ConnectedCacheServers + 1;
+                    endpointId++;
                 }
                 else
                 {
