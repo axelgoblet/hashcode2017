@@ -15,6 +15,10 @@ namespace HashCode2017.Solution
                 endpoint.ConnectedCaches = endpoint.ConnectedCaches.Where(c => c.Latency < endpoint.Latency).ToList();
             }
 
+            var videoRequests =
+                problem.RequestDescriptions.GroupBy(x => x.VideoId)
+                    .Select(grouping => new {VideoId = grouping.Key, Count = grouping.Count()})
+                    .ToList();
 
             var solution = Solve();
             Parser.Publish(solution, "../../../Output/me_at_the_zoo.out");
