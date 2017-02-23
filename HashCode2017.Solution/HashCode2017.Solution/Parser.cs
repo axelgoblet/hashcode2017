@@ -47,7 +47,7 @@ namespace HashCode2017.Solution
                     };
 
                     problem.Endpoints.Add(latestEndpoint);
-                    nextEndpoint = i + latestEndpoint.ConnectedCacheServers;
+                    nextEndpoint = i + latestEndpoint.ConnectedCacheServers + 1;
                 }
                 else
                 {
