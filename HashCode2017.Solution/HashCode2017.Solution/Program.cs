@@ -17,8 +17,15 @@ namespace HashCode2017.Solution
 
             var videoRequests =
                 problem.RequestDescriptions.GroupBy(x => x.VideoId)
-                    .Select(grouping => new {VideoId = grouping.Key, Count = grouping.Count()})
-                    .OrderByDescending(x => x.Count)
+                    .Select(
+                        grouping =>
+                            new
+                            {
+                                VideoId = grouping.Key,
+                                EndpointIds = grouping.Select(x => x.EndpointId).ToList(),
+                                RequestCount = grouping.Sum(y => y.NumberOfRequests)
+                            })
+                    .OrderByDescending(x => x.RequestCount)
                     .ToList();
 
             var solution = Solve();
