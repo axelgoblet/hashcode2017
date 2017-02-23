@@ -31,6 +31,7 @@ namespace HashCode2017.Solution
             var nextEndpoint = 2;
             Endpoint latestEndpoint = null;
             var lastIndex = 2;
+            var cacheServers = new List<CacheServer>();
 
             for (int i = 2; i < lines.Length; i++)
             {
@@ -60,9 +61,16 @@ namespace HashCode2017.Solution
                         Latency = Convert.ToInt32(unparsed[1])
                     };
 
+                    if (!cacheServers.Any(y => y.Id == cache.Id))
+                    {
+                        cacheServers.Add(new CacheServer {Id = cache.Id});
+                    }
+
                     latestEndpoint.ConnectedCaches.Add(cache);
                 }
             }
+
+            problem.CacheServers = cacheServers;
 
             for (int i = lastIndex; i < lines.Length; i++)
             {
@@ -88,7 +96,8 @@ namespace HashCode2017.Solution
 
                 foreach (var cacheServer in solution.CacheServers)
                 {
-                    writeStream.WriteLine("{0} {1}", cacheServer.Id, string.Join(" ", cacheServer.VideoIds.Select(x => x.ToString())));
+                    writeStream.WriteLine("{0} {1}", cacheServer.Id,
+                        string.Join(" ", cacheServer.VideoIds.Select(x => x.ToString())));
                 }
             }
         }

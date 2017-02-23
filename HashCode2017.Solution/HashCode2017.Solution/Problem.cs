@@ -26,6 +26,8 @@ namespace HashCode2017.Solution
         public List<Endpoint> Endpoints { get; set; }
 
         public List<RequestDescription> RequestDescriptions { get; set; }
+
+        public List<CacheServer> CacheServers { get; set; }
     }
 
     public class Video
