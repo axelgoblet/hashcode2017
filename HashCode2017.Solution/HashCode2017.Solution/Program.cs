@@ -8,7 +8,7 @@ namespace HashCode2017.Solution
         static void Main(string[] args)
         {
             var problem = Parser.Load("../../../Input/me_at_the_zoo.in");
-            
+
             problem.Endpoints = problem.Endpoints.Where(e => e.ConnectedCacheServers > 0).ToList();
             foreach (var endpoint in problem.Endpoints)
             {
@@ -18,6 +18,7 @@ namespace HashCode2017.Solution
             var videoRequests =
                 problem.RequestDescriptions.GroupBy(x => x.VideoId)
                     .Select(grouping => new {VideoId = grouping.Key, Count = grouping.Count()})
+                    .OrderByDescending(x => x.Count)
                     .ToList();
 
             var solution = Solve();
