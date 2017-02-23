@@ -45,7 +45,9 @@ namespace HashCode2017.Solution
 
         static void Main(string[] args)
         {
-            var problem = Parser.Load("../../../Input/me_at_the_zoo.in");
+            // var problem = Parser.Load("../../../Input/me_at_the_zoo.in");
+            var problem = Parser.Load("../../../Input/videos_worth_spreading.in");
+            // var problem = Parser.Load("../../../Input/trending_today.in");
 
             problem.Endpoints = problem.Endpoints.Where(e => e.ConnectedCacheServers > 0).ToList();
             foreach (var endpoint in problem.Endpoints)
@@ -76,16 +78,44 @@ namespace HashCode2017.Solution
                     .OrderByDescending(x => x.Value)
                     .ToList();
 
-            foreach (var videoStatistic in videoRequests)
+            var solution = new Solution();
+
+            foreach (var cacheServer in problem.CacheServers)
             {
-                var result = videoStatistic.Endpoints
-                    .Select(endpoint => problem.CacheServers
-                        .Count(cache => cache.Endpoints.Any(z => z.Id == endpoint.Id)))
-                    .ToList();
+                solution.CacheServers.Add(new CacheServer {Id = cacheServer.Id});
             }
 
-            var solution = Solve();
-            Parser.Publish(solution, "../../../Output/me_at_the_zoo.out");
+            foreach (var videoStatistic in videoRequests)
+            {
+                CacheServer bestCache = null;
+                var bestScore = 0;
+                foreach (var cacheServer in problem.CacheServers)
+                {
+                    var intersect = videoStatistic.Endpoints.Intersect(cacheServer.Endpoints).ToList();
+                    if (bestCache == null || intersect.Count > bestScore)
+                    {
+                        var solutionCache = solution.CacheServers.Single(y => y.Id == cacheServer.Id);
+                        if (solutionCache.CurrentSize + videoStatistic.Video.Size > problem.CacheServerCapacity)
+                        {
+                            continue;
+                        }
+
+                        bestCache = cacheServer;
+                        bestScore = intersect.Count;
+                    }
+                }
+
+                if (bestCache != null)
+                {
+                    var cache = solution.CacheServers.Single(y => y.Id == bestCache.Id);
+                    cache.VideoIds.Add(videoStatistic.Video.Id);
+                    cache.CurrentSize += videoStatistic.Video.Size;
+                }
+            }
+
+            // Parser.Publish(solution, "../../../Output/me_at_the_zoo.out");
+            Parser.Publish(solution, "../../../Output/videos_worth_spreading.out");
+            // Parser.Publish(solution, "../../../Output/trending_today.out");
         }
 
         private static Solution Solve()

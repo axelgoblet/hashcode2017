@@ -4,6 +4,11 @@ namespace HashCode2017.Solution
 {
     public class Solution
     {
+        public Solution()
+        {
+            CacheServers = new List<CacheServer>();
+        }
+
         public List<CacheServer> CacheServers { get; set; }
     }
 
@@ -16,6 +21,8 @@ namespace HashCode2017.Solution
         }
 
         public int Id { get; set; }
+
+        public int CurrentSize { get; set; }
 
         public List<int> VideoIds { get; set; }
 
