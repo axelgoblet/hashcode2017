@@ -10,6 +10,7 @@ namespace HashCode2017.Solution
     {
         static void Main(string[] args)
         {
+            var problem = Parser.Load("../../../Input/me_at_the_zoo.in");
         }
     }
 }
